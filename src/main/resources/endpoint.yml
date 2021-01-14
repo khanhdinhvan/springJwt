@@ -1,0 +1,8 @@
+endpoint:
+  auth:
+    signIn: /auth
+  user:
+    create: /user/create
+    update: /user/update
+    find: /user/find/{userId}
+    findAll: /users
