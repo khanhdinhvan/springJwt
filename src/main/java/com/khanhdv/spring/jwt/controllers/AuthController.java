@@ -16,12 +16,10 @@ import javax.validation.Valid;
 public class AuthController extends BaseController {
 
     private AuthService authService;
-    private UserService userService;
 
     @Autowired
-    public AuthController(AuthService authService, UserService userService) {
+    public AuthController(AuthService authService) {
         this.authService = authService;
-        this.userService = userService;
     }
 
     @PostMapping(value = "${endpoint.auth.signIn}")

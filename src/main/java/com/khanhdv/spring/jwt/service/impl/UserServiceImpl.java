@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -79,11 +80,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<?> findAll() {
-        List<User> users = userRepository.findAll();
-        return ResponseEntity.ok(UserMapper.INSTANCE.toListUserResponse(userRepository.findAll()));
+//        return ResponseEntity.ok(UserMapper.INSTANCE.toListUserResponse(userRepository.findAll()));
+        return ResponseEntity.ok(ObjectMapperUtils.mapAll(userRepository.findAll(), UserResponse.class));
+
     }
 
     @Override
+
     public ResponseEntity<?> search(SearchRequest request) {
         return ResponseEntity.ok(ObjectMapperUtils.mapAll(userRepository.findByIdAndUsername(request.getId(), request.getUsername()), UserResponse.class));
     }
@@ -91,9 +94,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<?> update(UserUpdateRequest request) {
         Optional<User> user = userRepository.findById(request.getId());
-        if (user != null) {
+        if (user.isPresent()) {
             UserMapper.INSTANCE.toUser(request, user.get());
-            userRepository.save(user.get());
             return ResponseEntity.ok(new MessageResponse("User update successfully!"));
         }
         return ResponseEntity.ok(new MessageResponse("User update errors!"));
@@ -101,7 +103,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<?> find(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        return ResponseEntity.ok(user != null ? UserMapper.INSTANCE.toUserResponse(user.get()) : null);
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("Not found Tutorial with"));
+        return ResponseEntity.ok(ObjectMapperUtils.map(user, UserResponse.class));
     }
 }

@@ -30,7 +30,7 @@ public class UserValidator implements Validator {
     public void validate(Object target, Errors errors) {
         SignupRequest request = ((SignupRequest) target);
         if (userRepository.existsByUsername(request.getUsername())) {
-            errors.rejectValue("username", request.getUsername(), messageService.getMessage("user.name.exist"));
+            errors.rejectValue("username", request.getUsername(), messageService.getMessage("error.user.name.exist"));
         }
     }
 }
