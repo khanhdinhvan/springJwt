@@ -4,7 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.NotBlank;
+
+import javax.validation.constraints.NotEmpty;
 
 @Getter
 @Setter
@@ -13,8 +14,10 @@ import org.hibernate.validator.constraints.NotBlank;
 public class LoginRequest {
 
 
+	@NotEmpty
 	private String username;
 
+	@NotEmpty
 	private String password;
 
 }
