@@ -1,6 +1,7 @@
 endpoint:
   auth:
-    signIn: /auth
+    signIn: /auth/signIn
+    userInfo: /auth/userInfo
   user:
     create: /user/create
     update: /user/update
