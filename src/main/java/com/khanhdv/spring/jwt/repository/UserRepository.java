@@ -1,5 +1,6 @@
 package com.khanhdv.spring.jwt.repository;
 
+import com.khanhdv.spring.jwt.models.Permission;
 import com.khanhdv.spring.jwt.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -17,5 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
   Boolean existsByEmail(String email);
 
   List<User> findByIdAndUsername(Long id, String username);
-  
+
+  User findByIdAndIsDeletedIsFalse(Long id);
+
 }

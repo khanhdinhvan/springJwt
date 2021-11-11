@@ -4,6 +4,7 @@ import com.khanhdv.spring.jwt.common.constant.CommonConstant;
 import com.khanhdv.spring.jwt.security.jwt.AuthEntryPointJwt;
 import com.khanhdv.spring.jwt.security.jwt.AuthTokenFilter;
 import com.khanhdv.spring.jwt.security.services.UserDetailsServiceImpl;
+import io.swagger.models.HttpMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
@@ -53,6 +54,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
+    public CustomAccessDeniedHandler customAccessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
+    }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -60,9 +66,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers("/**").permitAll()
+                .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler())
+                .authenticationEntryPoint(unauthorizedHandler).and()
+                .authorizeRequests().antMatchers("/auth/**").permitAll()
+                .antMatchers("/user/userInfo").hasAnyRole("ROLE_USER")
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

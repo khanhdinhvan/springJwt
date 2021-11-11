@@ -13,9 +13,9 @@ public class MessageService {
     @Autowired
     private MessageSource messageSource;
 
-    public String getMessage(String code) {
+    public String getMessage(String code, String argument) {
         Locale locale = LocaleContextHolder.getLocale();
-        return messageSource.getMessage(code, null, locale);
+        return messageSource.getMessage(code, new Object[] {argument}, locale);
     }
 
 }

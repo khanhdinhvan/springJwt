@@ -1,22 +1,30 @@
 package com.khanhdv.spring.jwt.models;
 
-import com.khanhdv.spring.jwt.common.enums.ERole;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Table(name = "roles")
 @Getter
 @Setter
-public class Role {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class Role extends BaseEntity<Long> implements Serializable {
 
-	@Enumerated(EnumType.STRING)
 	@Column(length = 20)
-	private ERole name;
+	private String name;
+
+	@Column(name = "is_deleted")
+	private Boolean isDeleted;
+
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "roles_permission",
+			joinColumns = @JoinColumn(name = "role_id"),
+			inverseJoinColumns = @JoinColumn(name = "permission_id"))
+	private List<Permission> permissions;
 
 }

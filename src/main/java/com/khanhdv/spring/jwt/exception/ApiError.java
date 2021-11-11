@@ -53,17 +53,16 @@ public class ApiError {
         subErrors.add(subError);
     }
 
-    private void addValidationError(String object, String field, Object rejectedValue, String message) {
-        addSubError(new ApiValidationError(object, field, rejectedValue, message));
+    private void addValidationError(String field, Object rejectedValue, String message) {
+        addSubError(new ApiValidationError(field, rejectedValue, message));
     }
 
-    private void addValidationError(String object, String message) {
-        addSubError(new ApiValidationError(object, message));
+    private void addValidationError(String message) {
+        addSubError(new ApiValidationError(message));
     }
 
     private void addValidationError(FieldError fieldError) {
         this.addValidationError(
-                fieldError.getObjectName(),
                 fieldError.getField(),
                 fieldError.getRejectedValue(),
                 fieldError.getDefaultMessage());
@@ -74,7 +73,7 @@ public class ApiError {
     }
 
     private void addValidationError(ObjectError objectError) {
-        this.addValidationError(objectError.getObjectName(), objectError.getDefaultMessage());
+        this.addValidationError(objectError.getDefaultMessage());
     }
 
     public void addValidationError(List<ObjectError> globalErrors) {
@@ -83,7 +82,6 @@ public class ApiError {
 
     private void addValidationError(ConstraintViolation<?> cv) {
         this.addValidationError(
-                cv.getRootBeanClass().getSimpleName(),
                 ((PathImpl) cv.getPropertyPath()).getLeafNode().asString(),
                 cv.getInvalidValue(),
                 cv.getMessage());

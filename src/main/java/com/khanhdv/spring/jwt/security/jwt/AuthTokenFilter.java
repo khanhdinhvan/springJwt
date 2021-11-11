@@ -2,6 +2,7 @@ package com.khanhdv.spring.jwt.security.jwt;
 
 import com.khanhdv.spring.jwt.common.constant.CommonConstant;
 import com.khanhdv.spring.jwt.security.services.UserDetailsServiceImpl;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,7 +45,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (ExpiredJwtException e) {
             log.error("Cannot set user authentication: {}", e);
         }
 

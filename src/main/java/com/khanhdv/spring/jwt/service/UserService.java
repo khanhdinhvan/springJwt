@@ -1,13 +1,13 @@
 package com.khanhdv.spring.jwt.service;
 
 import com.khanhdv.spring.jwt.payload.request.SearchRequest;
-import com.khanhdv.spring.jwt.payload.request.SignupRequest;
-import com.khanhdv.spring.jwt.payload.request.UserUpdateRequest;
+import com.khanhdv.spring.jwt.payload.request.user.UserRegisterRequest;
+import com.khanhdv.spring.jwt.payload.request.user.UserUpdateRequest;
 import org.springframework.http.ResponseEntity;
 
 public interface UserService {
 
-    ResponseEntity<?> create(SignupRequest signUpRequest);
+    ResponseEntity<?> create(UserRegisterRequest signUpRequest);
 
     ResponseEntity<?> findAll();
 

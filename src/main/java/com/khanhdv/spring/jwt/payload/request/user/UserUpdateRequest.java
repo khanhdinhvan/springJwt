@@ -1,4 +1,4 @@
-package com.khanhdv.spring.jwt.payload.request;
+package com.khanhdv.spring.jwt.payload.request.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,4 +26,9 @@ public class UserUpdateRequest {
     @Email(message = "{email.invalidate}")
     private String email;
 
+    private List<Long> roleId;
+
+    private boolean active;
+
+    private String password;
 }

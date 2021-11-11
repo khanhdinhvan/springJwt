@@ -1,27 +1,29 @@
 package com.khanhdv.spring.jwt.service.impl;
 
 import com.khanhdv.spring.jwt.common.converter.ObjectMapperUtils;
-import com.khanhdv.spring.jwt.common.enums.ERole;
-import com.khanhdv.spring.jwt.dto.UserMapper;
 import com.khanhdv.spring.jwt.models.Role;
 import com.khanhdv.spring.jwt.models.User;
 import com.khanhdv.spring.jwt.payload.request.SearchRequest;
-import com.khanhdv.spring.jwt.payload.request.SignupRequest;
-import com.khanhdv.spring.jwt.payload.request.UserUpdateRequest;
+import com.khanhdv.spring.jwt.payload.request.user.UserRegisterRequest;
+import com.khanhdv.spring.jwt.payload.request.user.UserUpdateRequest;
 import com.khanhdv.spring.jwt.payload.response.MessageResponse;
+import com.khanhdv.spring.jwt.payload.response.RoleData;
 import com.khanhdv.spring.jwt.payload.response.UserResponse;
 import com.khanhdv.spring.jwt.repository.RoleRepository;
 import com.khanhdv.spring.jwt.repository.UserRepository;
 import com.khanhdv.spring.jwt.service.UserService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -41,47 +43,41 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<?> create(SignupRequest signUpRequest) {
-
+    public ResponseEntity<?> create(UserRegisterRequest request) {
         User user = User.builder()
-                .username(signUpRequest.getUsername())
-                .email(signUpRequest.getEmail())
-                .password(encoder.encode(signUpRequest.getPassword()))
-                .isActive(true)
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .password(encoder.encode(request.getPassword()))
+                .isActive(request.isActive())
                 .isDeleted(false)
                 .build();
-
-        List<String> strRoles = signUpRequest.getRole();
-        List<Role> roles = new ArrayList<>();
-
-        if (strRoles == null) {
-            Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(adminRole);
-                        break;
-                    default:
-                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
-                }
-            });
+        if (!request.getRoleId().isEmpty()) {
+            List<Role> userRole = roleRepository.findByIdIn(request.getRoleId());
+            user.setRoles(userRole);
         }
-        user.setRoles(roles);
         userRepository.save(user);
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
     @Override
     public ResponseEntity<?> findAll() {
-//        return ResponseEntity.ok(UserMapper.INSTANCE.toListUserResponse(userRepository.findAll()));
-        return ResponseEntity.ok(ObjectMapperUtils.mapAll(userRepository.findAll(), UserResponse.class));
+        List<User> users = userRepository.findAll();
+        List<UserResponse> result = users.stream()
+                .map(x -> {
+                    UserResponse userResponse = UserResponse.builder()
+                            .id(x.getId())
+                            .username(x.getUsername())
+                            .email(x.getEmail())
+                            .isActive(x.getIsActive())
+                            .roles(x.getRoles().stream().map(role -> RoleData
+                                            .builder()
+                                            .name(role.getName()).id(role.getId()).build())
+                                    .collect(Collectors.toList()))
+                            .build();
+                    return userResponse;
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(result);
 
     }
 
@@ -93,17 +89,38 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<?> update(UserUpdateRequest request) {
-        Optional<User> user = userRepository.findById(request.getId());
-        if (user.isPresent()) {
-            UserMapper.INSTANCE.toUser(request, user.get());
-            return ResponseEntity.ok(new MessageResponse("User update successfully!"));
+        User user = userRepository.findByIdAndIsDeletedIsFalse(request.getId());
+        if (Objects.isNull(user)) {
+            throw new EntityNotFoundException("User update errors!");
         }
-        return ResponseEntity.ok(new MessageResponse("User update errors!"));
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        if (StringUtils.isNotBlank(request.getPassword())) {
+            user.setPassword(encoder.encode(request.getPassword()));
+        }
+        user.setIsActive(request.isActive());
+        List<Role> userRole = roleRepository.findByIdIn(request.getRoleId());
+        user.setRoles(userRole);
+        userRepository.save(user);
+        return ResponseEntity.ok(new MessageResponse("User update successfully!"));
     }
 
     @Override
     public ResponseEntity<?> find(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("Not found Tutorial with"));
-        return ResponseEntity.ok(ObjectMapperUtils.map(user, UserResponse.class));
+        User user = userRepository.findByIdAndIsDeletedIsFalse(userId);
+        if (Objects.isNull(user)) {
+            throw new EntityNotFoundException("User find errors!");
+        }
+        UserResponse userResponse = UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .isActive(user.getIsActive())
+                .roles(user.getRoles().stream().map(role -> RoleData
+                                .builder()
+                                .name(role.getName()).id(role.getId()).build())
+                        .collect(Collectors.toList()))
+                .build();
+        return ResponseEntity.ok(userResponse);
     }
 }

@@ -1,9 +1,19 @@
 endpoint:
   auth:
     signIn: /auth/signIn
-    userInfo: /auth/userInfo
   user:
-    create: /user/create
+    userInfo: /user/userInfo
+    register: /user/register
     update: /user/update
     find: /user/find/{userId}
     findAll: /users
+  role:
+    register: /role/register
+    update: /role/update
+    find: /role/find/{roleId}
+    findAll: /roles
+  permission:
+    register: /permission/register
+    update: /permission/update
+    find: /permission/find/{permissionId}
+    findAll: /permissions

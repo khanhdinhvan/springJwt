@@ -1,8 +1,6 @@
 package com.khanhdv.spring.jwt.exception;
 
 import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -92,7 +90,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex) {
-        return buildResponseEntity(new ApiError(HttpStatus.NOT_FOUND, ex));
+        String error = "Entity not found";
+        return buildResponseEntity(new ApiError(HttpStatus.NOT_FOUND, error, ex));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

@@ -1,10 +1,6 @@
 package com.khanhdv.spring.jwt.payload.response;
 
-import com.khanhdv.spring.jwt.models.Role;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -12,6 +8,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class UserResponse {
 
     private Long id;
@@ -20,10 +17,8 @@ public class UserResponse {
 
     private String email;
 
-    private Boolean isActive;
+    private boolean isActive;
 
-    private Boolean isDeleted;
-
-    private List<Role> roles;
+    private List<RoleData> roles;
 
 }

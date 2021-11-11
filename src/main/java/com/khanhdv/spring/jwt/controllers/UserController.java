@@ -1,8 +1,8 @@
 package com.khanhdv.spring.jwt.controllers;
 
 import com.khanhdv.spring.jwt.payload.request.SearchRequest;
-import com.khanhdv.spring.jwt.payload.request.SignupRequest;
-import com.khanhdv.spring.jwt.payload.request.UserUpdateRequest;
+import com.khanhdv.spring.jwt.payload.request.user.UserRegisterRequest;
+import com.khanhdv.spring.jwt.payload.request.user.UserUpdateRequest;
 import com.khanhdv.spring.jwt.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,14 +22,14 @@ public class UserController extends BaseController {
         this.userService = userService;
     }
 
-    @PostMapping(value = "${endpoint.user.create}")
+    @PostMapping(value = "${endpoint.user.register}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<?> createUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        return userService.create(signUpRequest);
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegisterRequest request) {
+        return userService.create(request);
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping(value = "${endpoint.user.update}")
+    @PutMapping(value = "${endpoint.user.update}")
     public ResponseEntity<?> updateUser(@Valid @RequestBody UserUpdateRequest request) {
         return userService.update(request);
     }
