@@ -18,6 +18,5 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
     List<Role> findByIdIn(List<Long> id);
 
     Role findByIdAndIsDeletedIsFalse(Long id);
-
-
+    
 }
